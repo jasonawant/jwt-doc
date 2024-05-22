@@ -93,7 +93,23 @@ If the decryption succeeded, the variable `$recipient` will be set with the reci
 ```php
 <?php
 
+use Jose\Component\Checker\HeaderCheckerManager;
 use Jose\Component\Encryption\JWELoader;
+
+$headerCheckerManager = new HeaderCheckerManager(
+    // Provide the allowed algorithms using the previously created
+    // AlgorithmManager.
+    [
+        new AlgorithmChecker(
+            $keyEncryptionAlgorithmManager->list()
+        )
+    ],
+    // Provide the appropriate TokenTypeSupport[].
+    [
+        new JWETokenSupport(),
+    ]
+);
+
 
 $jweLoader = new JWELoader(
     $serializerManager,
@@ -102,6 +118,8 @@ $jweLoader = new JWELoader(
 );
 
 $jwe = $jweLoader->loadAndDecryptWithKey($token, $key, $recipient);
+
+$payload = $jwe->getPayload();
 ```
 
 In case you use a key set, you can use the method `loadAndDecryptWithKeySet`.
